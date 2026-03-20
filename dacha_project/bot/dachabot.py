@@ -1,17 +1,35 @@
-from aiogram import Bot, Dispatcher, types
+from aiogram import Bot, Dispatcher, types, F
+from dotenv import load_dotenv
 from aiogram.types import WebAppInfo, ReplyKeyboardMarkup, KeyboardButton
+import asyncio
+import os
 
-bot = Bot(token="8684459718:AAFZW-a3Iae5BTQ6l82NzUZLr_OJwOQtsvY")
+load_dotenv()  # загружаем .env
+TOKEN = os.environ.get("Telegram_token")
+bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
 
-@dp.message_handler(commands=['start'])
+@dp.message(F.text == "/start")
 async def start(msg: types.Message):
-    kb = ReplyKeyboardMarkup(resize_keyboard=True)
-    kb.add(
-        KeyboardButton(
-            text="Найти дачу",
-            web_app=WebAppInfo(url="https://your-site.com")
-        )
+    kb = ReplyKeyboardMarkup(
+        keyboard=[
+            [KeyboardButton(text="🏠 Главная")],  # первая строка кнопок
+            [KeyboardButton(text="ℹ️ Информация")],  # вторая строка кнопок
+            [KeyboardButton(
+                text="Найти дачу",
+                web_app=WebAppInfo(url="https://dacha-finder.onrender.com")
+            )]  # третья строка кнопок
+        ],
+        resize_keyboard=True
     )
-    await msg.answer("Открой мини приложение:", reply_markup=kb)
+
+    await msg.answer("Открой мини-приложение:", reply_markup=kb)
+
+
+async def main():
+    await dp.start_polling(bot)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
