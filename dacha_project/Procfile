@@ -1,0 +1,1 @@
+web: gunicorn dacha_project.wsgi

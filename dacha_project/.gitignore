@@ -1,0 +1,13 @@
+# Виртуальное окружение
+.venv/
+
+# PyCharm и IDE
+.idea/
+.vscode/
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Локальная база данных (если есть)
+db.sqlite3
