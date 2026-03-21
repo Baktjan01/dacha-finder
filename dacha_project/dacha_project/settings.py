@@ -74,7 +74,7 @@ WSGI_APPLICATION = 'dacha_project.wsgi.application'
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 DATABASES = {
     "default": dj_database_url.config(
-        default="postgres://postgres:123@localhost:5432/dacha_bd",
+        default="postgres://postgres:123@localhost:5432/db_dacha_finder",
         conn_max_age=600,
         engine="django.db.backends.postgresql"
     )
