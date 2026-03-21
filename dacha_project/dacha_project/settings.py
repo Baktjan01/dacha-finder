@@ -76,7 +76,7 @@ DATABASES = {
     "default": dj_database_url.config(
         default="postgres://postgres:123@host:port/dacha_bd",
         conn_max_age=600,
-        engine="django.db.backends.postgresql_psycopg"
+        engine="django.db.backends.postgresql"
     )
 }
 
