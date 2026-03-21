@@ -1,1 +1,1 @@
-web: gunicorn dacha_project.wsgi
+web: gunicorn dacha_project.wsgi:application
