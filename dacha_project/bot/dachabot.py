@@ -24,7 +24,7 @@ async def start(msg: types.Message):
         resize_keyboard=True
     )
 
-    await msg.answer("Открой мини-приложение:", reply_markup=kb)
+    await msg.answer("123", reply_markup=kb)
 
 
 async def main():
