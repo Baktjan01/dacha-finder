@@ -6,6 +6,10 @@ import os
 
 load_dotenv()  # загружаем .env
 TOKEN = os.environ.get("Telegram_token")
+
+if not TOKEN:
+    raise ValueError("TOKEN NOT FOUND")
+
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
@@ -28,6 +32,8 @@ async def start(msg: types.Message):
 
 
 async def main():
+    print("BOT STARTED")
+    await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
 
 
