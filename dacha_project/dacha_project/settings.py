@@ -51,7 +51,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'dacha_project.dacha_project.urls'
+ROOT_URLCONF = 'dacha_project.urls'
 
 TEMPLATES = [
     {
