@@ -1,5 +1,5 @@
-from django.http import HttpResponse
+from django.shortcuts import render
 
 
 def index(request):
-    return HttpResponse("<h1>Привет! Это главная страница Dacha Finder</h1>")
+    return render(request, 'home.html')
