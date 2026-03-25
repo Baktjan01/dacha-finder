@@ -7,8 +7,10 @@ from aiogram.types import WebAppInfo, ReplyKeyboardMarkup, KeyboardButton
 from dotenv import load_dotenv
 
 # Загружаем токен
-load_dotenv('../.env')  # путь к .env
+load_dotenv()
 TOKEN = os.environ.get("Telegram_token")
+if not TOKEN:
+    raise ValueError("BOT_TOKEN не задан в .env")
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
 

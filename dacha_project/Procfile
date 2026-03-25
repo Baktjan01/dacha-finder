@@ -1,1 +1,1 @@
-web: gunicorn dacha_project.wsgi --bind 0.0.0.0:$PORT
+worker: python dacha_project/bot/dachabot.py
