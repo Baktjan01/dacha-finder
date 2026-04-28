@@ -1,20 +1,595 @@
 <!DOCTYPE html>
 {% load static %}
-<html lang="en">
+<html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <title>Dacha Finder</title>
-    <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
-    <link rel="stylesheet" href="{% static 'home.css' %}">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Dacha Finder</title>
+<link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600&family=Onest:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --green:    #2D6A4F;
+  --green-l:  #40916C;
+  --green-xl: #D8F3DC;
+  --sand:     #F4ECD6;
+  --sand-d:   #E8D9BA;
+  --text:     #1B2B22;
+  --text-m:   #5A6B5E;
+  --text-s:   #8FA68A;
+  --white:    #FAFAF8;
+  --card-bg:  #FFFFFF;
+  --border:   rgba(45,106,79,.13);
+  --shadow:   0 2px 16px rgba(27,43,34,.10);
+  --r:        16px;
+  --tab-h:    64px;
+  --safe-b:   env(safe-area-inset-bottom, 0px);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+body {
+  font-family: 'Onest', sans-serif;
+  background: var(--sand);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  padding-bottom: calc(var(--tab-h) + var(--safe-b) + 12px);
+}
+
+/* ── Header ── */
+.header {
+  position: sticky; top: 0; z-index: 10;
+  background: var(--white);
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid var(--border);
+}
+.header-row { display: flex; align-items: center; gap: 10px; }
+.logo { font-family: 'Unbounded', sans-serif; font-size: 17px; font-weight: 600; color: var(--green); flex: 1; }
+.logo span { color: var(--text-m); font-weight: 400; }
+
+.search-bar {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--sand); border-radius: 12px; padding: 10px 14px;
+  margin-top: 10px; border: 1px solid var(--border);
+}
+.search-bar input {
+  flex: 1; border: none; background: none; font-family: 'Onest', sans-serif;
+  font-size: 14px; color: var(--text); outline: none;
+}
+.search-bar input::placeholder { color: var(--text-s); }
+.search-icon { width: 16px; height: 16px; color: var(--text-s); flex-shrink: 0; }
+
+.filter-btn {
+  background: var(--green); border: none; border-radius: 10px;
+  padding: 9px 14px; font-family: 'Onest', sans-serif; font-size: 13px;
+  font-weight: 500; color: #fff; cursor: pointer; display: flex; align-items: center; gap: 6px;
+  transition: background .15s;
+}
+.filter-btn:active { background: var(--green-l); }
+
+/* ── Pages ── */
+.page { display: none; padding: 16px; }
+.page.active { display: block; }
+
+/* ── Filter panel (slide down) ── */
+.filter-panel {
+  background: var(--white); border-radius: var(--r); margin: 0 16px 12px;
+  padding: 0; max-height: 0; overflow: hidden;
+  transition: max-height .3s ease, padding .3s ease;
+  border: 1px solid var(--border);
+}
+.filter-panel.open { max-height: 300px; padding: 16px; }
+.filter-panel label { font-size: 12px; font-weight: 500; color: var(--text-m); display: block; margin-bottom: 6px; }
+.filter-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+.filter-panel input, .filter-panel select {
+  width: 100%; padding: 9px 12px; border-radius: 10px;
+  border: 1px solid var(--border); background: var(--sand);
+  font-family: 'Onest', sans-serif; font-size: 14px; color: var(--text); outline: none;
+}
+.filter-apply {
+  width: 100%; padding: 11px; background: var(--green); color: #fff;
+  border: none; border-radius: 10px; font-family: 'Onest', sans-serif;
+  font-size: 14px; font-weight: 500; cursor: pointer;
+}
+
+/* ── Cards ── */
+.cards-grid { display: flex; flex-direction: column; gap: 12px; }
+
+.card {
+  background: var(--card-bg); border-radius: var(--r);
+  box-shadow: var(--shadow); overflow: hidden;
+  cursor: pointer; transition: transform .15s;
+  border: 1px solid var(--border);
+  animation: cardIn .3s ease both;
+}
+.card:active { transform: scale(.98); }
+
+@keyframes cardIn {
+  from { opacity:0; transform: translateY(12px); }
+  to   { opacity:1; transform: translateY(0); }
+}
+
+.card-img {
+  width: 100%; height: 170px; object-fit: cover;
+  background: linear-gradient(135deg, var(--green-xl) 0%, var(--sand-d) 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 48px; color: var(--green-l);
+}
+.card-img img { width: 100%; height: 100%; object-fit: cover; }
+
+.card-body { padding: 14px; }
+.card-title { font-family: 'Unbounded', sans-serif; font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+.card-location { font-size: 12px; color: var(--text-m); margin-bottom: 10px; display: flex; align-items: center; gap: 4px; }
+.card-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+.tag {
+  background: var(--green-xl); color: var(--green); border-radius: 6px;
+  padding: 4px 9px; font-size: 11px; font-weight: 500;
+}
+.card-footer { display: flex; justify-content: space-between; align-items: center; }
+.card-price { font-family: 'Unbounded', sans-serif; font-size: 15px; font-weight: 600; color: var(--green); }
+.card-price span { font-family: 'Onest', sans-serif; font-size: 11px; font-weight: 400; color: var(--text-m); }
+.card-phone {
+  background: var(--green); color: #fff; border: none;
+  border-radius: 8px; padding: 7px 12px; font-size: 12px;
+  font-family: 'Onest', sans-serif; font-weight: 500; cursor: pointer;
+  text-decoration: none; display: inline-block;
+}
+
+/* ── Empty state ── */
+.empty {
+  text-align: center; padding: 60px 20px; color: var(--text-m);
+}
+.empty-icon { font-size: 52px; margin-bottom: 12px; }
+.empty h3 { font-family: 'Unbounded', sans-serif; font-size: 14px; margin-bottom: 6px; color: var(--text); }
+.empty p { font-size: 13px; line-height: 1.5; }
+
+/* ── Loading ── */
+.skeleton { background: linear-gradient(90deg, var(--sand-d) 25%, var(--sand) 50%, var(--sand-d) 75%); background-size: 200% 100%; animation: shimmer 1.2s infinite; border-radius: var(--r); }
+@keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+.skel-card { height: 240px; }
+
+/* ── Add form page ── */
+.page-title {
+  font-family: 'Unbounded', sans-serif; font-size: 16px; font-weight: 600;
+  margin-bottom: 16px;
+}
+.form-group { margin-bottom: 14px; }
+.form-group label {
+  display: block; font-size: 12px; font-weight: 500; color: var(--text-m);
+  margin-bottom: 6px;
+}
+.form-group input, .form-group textarea, .form-group select {
+  width: 100%; padding: 12px 14px; border-radius: 12px;
+  border: 1px solid var(--border); background: var(--white);
+  font-family: 'Onest', sans-serif; font-size: 15px; color: var(--text); outline: none;
+  transition: border-color .15s;
+}
+.form-group input:focus, .form-group textarea:focus {
+  border-color: var(--green);
+}
+.form-group textarea { resize: none; height: 80px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.btn-submit {
+  width: 100%; padding: 15px; background: var(--green); color: #fff;
+  border: none; border-radius: 12px; font-family: 'Unbounded', sans-serif;
+  font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 6px;
+  transition: background .15s; display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn-submit:disabled { background: var(--text-s); cursor: not-allowed; }
+.btn-submit:active:not(:disabled) { background: var(--green-l); }
+
+/* ── Toast ── */
+.toast {
+  position: fixed; bottom: calc(var(--tab-h) + var(--safe-b) + 20px); left: 50%;
+  transform: translateX(-50%) translateY(20px); opacity: 0;
+  background: var(--text); color: #fff; padding: 10px 18px; border-radius: 20px;
+  font-size: 13px; white-space: nowrap; z-index: 100; transition: all .25s;
+  pointer-events: none;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ── Bottom tabs ── */
+.tabs {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 20;
+  background: var(--white); border-top: 1px solid var(--border);
+  display: flex; height: calc(var(--tab-h) + var(--safe-b));
+  padding-bottom: var(--safe-b);
+}
+.tab {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 3px; cursor: pointer; border: none;
+  background: none; font-family: 'Onest', sans-serif; font-size: 10px;
+  font-weight: 500; color: var(--text-s); transition: color .15s;
+  padding: 0;
+}
+.tab.active { color: var(--green); }
+.tab svg { width: 22px; height: 22px; }
+
+/* ── Detail modal ── */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 50;
+  display: flex; align-items: flex-end; opacity: 0; pointer-events: none;
+  transition: opacity .25s;
+}
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+.modal {
+  background: var(--white); border-radius: 24px 24px 0 0; width: 100%;
+  max-height: 85vh; overflow-y: auto; padding: 20px 20px calc(20px + var(--safe-b));
+  transform: translateY(40px); transition: transform .3s ease;
+}
+.modal-overlay.open .modal { transform: translateY(0); }
+.modal-handle { width: 36px; height: 4px; background: var(--sand-d); border-radius: 2px; margin: 0 auto 18px; }
+.modal-img {
+  width: 100%; height: 200px; border-radius: 16px; object-fit: cover;
+  background: linear-gradient(135deg, var(--green-xl), var(--sand-d));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 64px; margin-bottom: 16px; overflow: hidden;
+}
+.modal-img img { width: 100%; height: 100%; object-fit: cover; }
+.modal-title { font-family: 'Unbounded', sans-serif; font-size: 18px; font-weight: 600; margin-bottom: 6px; }
+.modal-loc { font-size: 13px; color: var(--text-m); margin-bottom: 14px; }
+.modal-price { font-family: 'Unbounded', sans-serif; font-size: 20px; font-weight: 600; color: var(--green); margin-bottom: 16px; }
+.modal-price span { font-family: 'Onest', sans-serif; font-size: 12px; font-weight: 400; color: var(--text-m); }
+.modal-desc { font-size: 14px; line-height: 1.6; color: var(--text-m); margin-bottom: 16px; }
+.modal-info { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+.info-chip { background: var(--sand); border-radius: 10px; padding: 10px 12px; }
+.info-chip .lbl { font-size: 11px; color: var(--text-s); margin-bottom: 2px; }
+.info-chip .val { font-size: 14px; font-weight: 500; }
+.modal-call {
+  display: block; width: 100%; padding: 15px; background: var(--green); color: #fff;
+  border: none; border-radius: 12px; text-align: center; text-decoration: none;
+  font-family: 'Unbounded', sans-serif; font-size: 14px; font-weight: 600;
+}
+
+/* ── Favorites counter ── */
+.fav-badge {
+  background: var(--green); color: #fff; font-size: 9px; font-weight: 600;
+  border-radius: 6px; padding: 1px 5px; position: absolute; top: 6px; right: 22px;
+}
+.tab { position: relative; }
+</style>
 </head>
 <body>
-<h1>Mini App работает 🚀</h1>
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script>
-    let tg = window.Telegram.WebApp;
-    tg.setBackgroundColor("#ffffff"); // фон белый
-    tg.expand();
+  const tg = window.Telegram?.WebApp;
+  if (tg) { tg.expand(); tg.setBackgroundColor('#F4ECD6'); }
+</script>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-row">
+    <div class="logo">Dacha<span>Finder</span></div>
+    <button class="filter-btn" onclick="toggleFilter()" id="filterBtn">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4h12M4 8h8M6 12h4"/></svg>
+      Фильтр
+    </button>
+  </div>
+  <div class="search-bar">
+    <svg class="search-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M15 15l-3-3"/></svg>
+    <input type="text" id="searchInput" placeholder="Поиск по названию, месту…" oninput="onSearch()">
+  </div>
+</div>
+
+<!-- Filter panel -->
+<div class="filter-panel" id="filterPanel">
+  <div class="filter-row">
+    <div>
+      <label>Цена от (сум)</label>
+      <input type="number" id="fMinPrice" placeholder="0">
+    </div>
+    <div>
+      <label>Цена до (сум)</label>
+      <input type="number" id="fMaxPrice" placeholder="∞">
+    </div>
+  </div>
+  <div style="margin-bottom:12px">
+    <label>Комнат</label>
+    <select id="fRooms">
+      <option value="">Любое</option>
+      <option value="1">1</option>
+      <option value="2">2</option>
+      <option value="3">3</option>
+      <option value="4">4+</option>
+    </select>
+  </div>
+  <button class="filter-apply" onclick="applyFilter()">Применить</button>
+</div>
+
+<!-- Page: Catalog -->
+<div class="page active" id="page-catalog">
+  <div class="cards-grid" id="cardsList">
+    <div class="skeleton skel-card"></div>
+    <div class="skeleton skel-card"></div>
+    <div class="skeleton skel-card"></div>
+  </div>
+</div>
+
+<!-- Page: Favorites -->
+<div class="page" id="page-favs">
+  <div class="cards-grid" id="favsList"></div>
+</div>
+
+<!-- Page: Add -->
+<div class="page" id="page-add">
+  <div class="page-title">Добавить дачу</div>
+  <div class="form-group">
+    <label>Название *</label>
+    <input type="text" id="fTitle" placeholder="Уютная дача у реки">
+  </div>
+  <div class="form-group">
+    <label>Местоположение *</label>
+    <input type="text" id="fLocation" placeholder="Ташкентская область, Паркент">
+  </div>
+  <div class="form-row">
+    <div class="form-group">
+      <label>Цена в сутки (сум) *</label>
+      <input type="number" id="fPrice" placeholder="150000">
+    </div>
+    <div class="form-group">
+      <label>Комнат</label>
+      <input type="number" id="fRoomsAdd" placeholder="3" min="1">
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group">
+      <label>Площадь (соток)</label>
+      <input type="number" id="fArea" placeholder="8">
+    </div>
+    <div class="form-group">
+      <label>Телефон *</label>
+      <input type="tel" id="fPhone" placeholder="+998 90 123 45 67">
+    </div>
+  </div>
+  <div class="form-group">
+    <label>Описание</label>
+    <textarea id="fDesc" placeholder="Расскажите о даче: удобства, особенности…"></textarea>
+  </div>
+  <div class="form-group">
+    <label>Ссылка на фото</label>
+    <input type="url" id="fImg" placeholder="https://…">
+  </div>
+  <button class="btn-submit" id="submitBtn" onclick="submitDacha()">
+    <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 4v12M4 10h12"/></svg>
+    Опубликовать
+  </button>
+</div>
+
+<!-- Bottom tabs -->
+<nav class="tabs">
+  <button class="tab active" id="tab-catalog" onclick="showPage('catalog')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg>
+    Каталог
+  </button>
+  <button class="tab" id="tab-favs" onclick="showPage('favs')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21l-7.5-7.5A5 5 0 0 1 11.5 6L12 6.5l.5-.5a5 5 0 0 1 7 7L12 21z"/></svg>
+    Избранное
+  </button>
+  <button class="tab" id="tab-add" onclick="showPage('add')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>
+    Добавить
+  </button>
+</nav>
+
+<!-- Detail modal -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-img" id="mImg">🏡</div>
+    <div class="modal-title" id="mTitle"></div>
+    <div class="modal-loc" id="mLoc"></div>
+    <div class="modal-price" id="mPrice"></div>
+    <div class="modal-info" id="mInfo"></div>
+    <div class="modal-desc" id="mDesc"></div>
+    <a class="modal-call" id="mPhone" href="#">📞 Позвонить</a>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+let allDachas = [];
+let favs = JSON.parse(localStorage.getItem('favs') || '[]');
+let filterOpen = false;
+let searchTimer;
+
+// ── Pages ──
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+  if (name === 'favs') renderFavs();
+}
+
+// ── Filter ──
+function toggleFilter() {
+  filterOpen = !filterOpen;
+  document.getElementById('filterPanel').classList.toggle('open', filterOpen);
+}
+
+function applyFilter() {
+  toggleFilter();
+  loadDachas();
+}
+
+function onSearch() {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(loadDachas, 350);
+}
+
+// ── Load dachas ──
+async function loadDachas() {
+  const search   = document.getElementById('searchInput').value;
+  const minPrice = document.getElementById('fMinPrice').value;
+  const maxPrice = document.getElementById('fMaxPrice').value;
+  const rooms    = document.getElementById('fRooms').value;
+
+  let url = '/api/dachas/?';
+  if (search)   url += 'search='    + encodeURIComponent(search) + '&';
+  if (minPrice) url += 'min_price=' + minPrice + '&';
+  if (maxPrice) url += 'max_price=' + maxPrice + '&';
+  if (rooms)    url += 'rooms='     + rooms + '&';
+
+  try {
+    const res  = await fetch(url);
+    const data = await res.json();
+    allDachas = data.dachas;
+    renderCards(allDachas, 'cardsList');
+  } catch (e) {
+    document.getElementById('cardsList').innerHTML =
+      '<div class="empty"><div class="empty-icon">⚠️</div><h3>Ошибка загрузки</h3><p>Проверьте соединение</p></div>';
+  }
+}
+
+// ── Render ──
+function renderCards(dachas, containerId) {
+  const el = document.getElementById(containerId);
+  if (!dachas.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon">🌿</div><h3>Ничего не найдено</h3><p>Попробуйте изменить фильтры</p></div>';
+    return;
+  }
+  el.innerHTML = dachas.map((d, i) => cardHTML(d, i)).join('');
+  updateFavBadge();
+}
+
+function cardHTML(d, i) {
+  const isFav = favs.includes(d.id);
+  const imgPart = d.image_url
+    ? `<div class="card-img"><img src="${esc(d.image_url)}" alt="" loading="lazy"></div>`
+    : `<div class="card-img">🏡</div>`;
+  return `
+  <div class="card" style="animation-delay:${i * 0.05}s" onclick="openModal(${d.id})">
+    ${imgPart}
+    <div class="card-body">
+      <div class="card-title">${esc(d.title)}</div>
+      <div class="card-location">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 1a5 5 0 0 1 5 5c0 4-5 9-5 9S3 10 3 6a5 5 0 0 1 5-5z"/><circle cx="8" cy="6" r="1.5"/></svg>
+        ${esc(d.location)}
+      </div>
+      <div class="card-tags">
+        <span class="tag">${d.rooms} комн.</span>
+        ${d.area ? `<span class="tag">${d.area} соток</span>` : ''}
+      </div>
+      <div class="card-footer">
+        <div class="card-price">${fmt(d.price)} <span>сум/сутки</span></div>
+        <a class="card-phone" href="tel:${esc(d.phone)}" onclick="event.stopPropagation()">Позвонить</a>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── Modal ──
+function openModal(id) {
+  const d = allDachas.find(x => x.id === id);
+  if (!d) return;
+  const mImg = document.getElementById('mImg');
+  if (d.image_url) {
+    mImg.innerHTML = `<img src="${esc(d.image_url)}" alt="">`;
+  } else {
+    mImg.innerHTML = '🏡';
+  }
+  document.getElementById('mTitle').textContent = d.title;
+  document.getElementById('mLoc').textContent   = '📍 ' + d.location;
+  document.getElementById('mPrice').innerHTML   = `${fmt(d.price)} <span>сум / сутки</span>`;
+  document.getElementById('mInfo').innerHTML = `
+    <div class="info-chip"><div class="lbl">Комнат</div><div class="val">${d.rooms}</div></div>
+    <div class="info-chip"><div class="lbl">Площадь</div><div class="val">${d.area || '—'} сот.</div></div>
+  `;
+  document.getElementById('mDesc').textContent  = d.description || 'Описание не указано.';
+  const ph = document.getElementById('mPhone');
+  ph.href = 'tel:' + d.phone;
+  ph.textContent = '📞 ' + d.phone;
+
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function closeModal(e) {
+  if (e.target === document.getElementById('modalOverlay'))
+    document.getElementById('modalOverlay').classList.remove('open');
+}
+
+// ── Favs ──
+function renderFavs() {
+  const favDachas = allDachas.filter(d => favs.includes(d.id));
+  renderCards(favDachas, 'favsList');
+}
+function updateFavBadge() {
+  const badge = document.querySelector('.fav-badge');
+  if (badge) badge.remove();
+  if (favs.length) {
+    const btn = document.getElementById('tab-favs');
+    const b = document.createElement('div');
+    b.className = 'fav-badge'; b.textContent = favs.length;
+    btn.appendChild(b);
+  }
+}
+
+// ── Submit ──
+async function submitDacha() {
+  const title    = document.getElementById('fTitle').value.trim();
+  const location = document.getElementById('fLocation').value.trim();
+  const price    = document.getElementById('fPrice').value;
+  const phone    = document.getElementById('fPhone').value.trim();
+
+  if (!title || !location || !price || !phone) {
+    showToast('Заполните обязательные поля *'); return;
+  }
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true; btn.textContent = 'Публикуем…';
+
+  try {
+    const res = await fetch('/api/dachas/create/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        title,
+        location,
+        price:       parseInt(price),
+        phone,
+        rooms:       parseInt(document.getElementById('fRoomsAdd').value || 1),
+        area:        parseFloat(document.getElementById('fArea').value || 0),
+        description: document.getElementById('fDesc').value.trim(),
+        image_url:   document.getElementById('fImg').value.trim(),
+      })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      showToast('✅ Дача опубликована!');
+      ['fTitle','fLocation','fPrice','fPhone','fRoomsAdd','fArea','fDesc','fImg']
+        .forEach(id => document.getElementById(id).value = '');
+      allDachas.unshift(data.dacha);
+      showPage('catalog');
+      renderCards(allDachas, 'cardsList');
+    } else {
+      showToast('Ошибка: ' + (data.error || 'попробуйте ещё раз'));
+    }
+  } catch {
+    showToast('Нет соединения');
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 4v12M4 10h12"/></svg> Опубликовать';
+}
+
+// ── Helpers ──
+function fmt(n) { return Number(n).toLocaleString('ru-RU'); }
+function esc(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ── Init ──
+loadDachas();
 </script>
 </body>
 </html>
