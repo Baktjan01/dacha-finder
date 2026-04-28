@@ -414,37 +414,14 @@ function toggleFilter() {
 
 function applyFilter() {
   toggleFilter();
-  loadDachas();
+
 }
 
 function onSearch() {
   clearTimeout(searchTimer);
-  searchTimer = setTimeout(loadDachas, 350);
 }
 
-// ── Load dachas ──
-async function loadDachas() {
-  const search   = document.getElementById('searchInput').value;
-  const minPrice = document.getElementById('fMinPrice').value;
-  const maxPrice = document.getElementById('fMaxPrice').value;
-  const rooms    = document.getElementById('fRooms').value;
 
-  let url = '/api/dachas/?';
-  if (search)   url += 'search='    + encodeURIComponent(search) + '&';
-  if (minPrice) url += 'min_price=' + minPrice + '&';
-  if (maxPrice) url += 'max_price=' + maxPrice + '&';
-  if (rooms)    url += 'rooms='     + rooms + '&';
-
-  try {
-    const res  = await fetch(url);
-    const data = await res.json();
-    allDachas = data.dachas;
-    renderCards(allDachas, 'cardsList');
-  } catch (e) {
-    document.getElementById('cardsList').innerHTML =
-      '<div class="empty"><div class="empty-icon">⚠️</div><h3>Ошибка загрузки</h3><p>Проверьте соединение</p></div>';
-  }
-}
 
 // ── Render ──
 function renderCards(dachas, containerId) {
@@ -542,35 +519,7 @@ async function submitDacha() {
   const btn = document.getElementById('submitBtn');
   btn.disabled = true; btn.textContent = 'Публикуем…';
 
-  try {
-    const res = await fetch('/api/dachas/create/', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        title,
-        location,
-        price:       parseInt(price),
-        phone,
-        rooms:       parseInt(document.getElementById('fRoomsAdd').value || 1),
-        area:        parseFloat(document.getElementById('fArea').value || 0),
-        description: document.getElementById('fDesc').value.trim(),
-        image_url:   document.getElementById('fImg').value.trim(),
-      })
-    });
-    const data = await res.json();
-    if (res.ok) {
-      showToast('✅ Дача опубликована!');
-      ['fTitle','fLocation','fPrice','fPhone','fRoomsAdd','fArea','fDesc','fImg']
-        .forEach(id => document.getElementById(id).value = '');
-      allDachas.unshift(data.dacha);
-      showPage('catalog');
-      renderCards(allDachas, 'cardsList');
-    } else {
-      showToast('Ошибка: ' + (data.error || 'попробуйте ещё раз'));
-    }
-  } catch {
-    showToast('Нет соединения');
-  }
+
 
   btn.disabled = false;
   btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 4v12M4 10h12"/></svg> Опубликовать';
@@ -589,7 +538,6 @@ function showToast(msg) {
 }
 
 // ── Init ──
-loadDachas();
 </script>
 </body>
 </html>
