@@ -1,22 +1,25 @@
 const tg = window.Telegram.WebApp;
 tg.ready();
 
-// Пробуем разные способы получить пользователя
 const user = tg.initDataUnsafe?.user;
-const initData = tg.initData;
 
-alert('user: ' + JSON.stringify(user) + '\ninitData: ' + initData);
 if (user) {
+    // Настоящий Telegram (мобильный)
     fetch('/api/users/auth/', {
-        method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({user})
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({user})
     })
         .then(res => res.json())
         .then(data => {
-            alert('ответ: ' + JSON.stringify(data)); // временно
             window.currentUserId = data.user_id;
             window.currentTelegramId = data.telegram_id;
-        })
-        .catch(err => alert('ошибка: ' + err)); // временно
+        });
+} else {
+    // Десктоп или браузер — гостевой режим
+    window.currentUserId = null;
+    window.currentTelegramId = null;
+    console.log('Гостевой режим');
 }
 
 function showPage(name) {
