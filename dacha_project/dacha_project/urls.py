@@ -6,4 +6,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include("finder_app.urls")),  # <-- теперь сработает
     path('webhook/', webhook),
+    path('api/users/', include('users.urls')),
+    path('api/', include('dachas.urls')),
 ]
+

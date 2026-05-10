@@ -1,8 +1,640 @@
-body{
-    background: white;
-    height: 100%;
+
+:root {
+    --green: #2D6A4F;
+    --green-l: #40916C;
+    --green-xl: #D8F3DC;
+    --sand: #F4ECD6;
+    --sand-d: #E8D9BA;
+    --text: #1B2B22;
+    --text-m: #5A6B5E;
+    --text-s: #8FA68A;
+    --white: #FAFAF8;
+    --card-bg: #FFFFFF;
+    --border: rgba(45, 106, 79, .13);
+    --shadow: 0 2px 16px rgba(27, 43, 34, .10);
+    --r: 16px;
+    --tab-h: 64px;
+    --safe-b: env(safe-area-inset-bottom, 0px);
 }
-h1{
-    font-family: Arial, Helvetica, sans-serif;
-    color: black;
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    font-family: 'Onest', sans-serif;
+    background: var(--sand);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+    padding-bottom: calc(var(--tab-h) + var(--safe-b) + 12px);
+}
+
+/* ── Header ── */
+.header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--white);
+    padding: 14px 16px 12px;
+    border-bottom: 1px solid var(--border);
+}
+
+.header-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logo {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--green);
+    flex: 1;
+}
+
+.logo span {
+    color: var(--text-m);
+    font-weight: 400;
+}
+
+.search-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--sand);
+    border-radius: 12px;
+    padding: 10px 14px;
+    margin-top: 10px;
+    border: 1px solid var(--border);
+}
+
+.search-bar input {
+    flex: 1;
+    border: none;
+    background: none;
+    font-family: 'Onest', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    outline: none;
+}
+
+.search-bar input::placeholder {
+    color: var(--text-s);
+}
+
+.search-icon {
+    width: 16px;
+    height: 16px;
+    color: var(--text-s);
+    flex-shrink: 0;
+}
+
+.filter-btn {
+    background: var(--green);
+    border: none;
+    border-radius: 10px;
+    padding: 9px 14px;
+    font-family: 'Onest', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background .15s;
+}
+
+.filter-btn:active {
+    background: var(--green-l);
+}
+
+/* ── Pages ── */
+.page {
+    display: none;
+    padding: 16px;
+}
+
+.page.active {
+    display: block;
+}
+
+/* ── Filter panel (slide down) ── */
+.filter-panel {
+    background: var(--white);
+    border-radius: var(--r);
+    margin: 0 16px 12px;
+    padding: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height .3s ease, padding .3s ease;
+    border: 1px solid var(--border);
+}
+
+.filter-panel.open {
+    max-height: 300px;
+    padding: 16px;
+}
+
+.filter-panel label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-m);
+    display: block;
+    margin-bottom: 6px;
+}
+
+.filter-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.filter-panel input, .filter-panel select {
+    width: 100%;
+    padding: 9px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--sand);
+    font-family: 'Onest', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    outline: none;
+}
+
+.filter-apply {
+    width: 100%;
+    padding: 11px;
+    background: var(--green);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Onest', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+/* ── Cards ── */
+.cards-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.card {
+    background: var(--card-bg);
+    border-radius: var(--r);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform .15s;
+    border: 1px solid var(--border);
+    animation: cardIn .3s ease both;
+}
+
+.card:active {
+    transform: scale(.98);
+}
+
+@keyframes cardIn {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.card-img {
+    width: 100%;
+    height: 170px;
+    object-fit: cover;
+    background: linear-gradient(135deg, var(--green-xl) 0%, var(--sand-d) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    color: var(--green-l);
+}
+
+.card-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.card-body {
+    padding: 14px;
+}
+
+.card-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.card-location {
+    font-size: 12px;
+    color: var(--text-m);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.card-tags {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+
+.tag {
+    background: var(--green-xl);
+    color: var(--green);
+    border-radius: 6px;
+    padding: 4px 9px;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-price {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--green);
+}
+
+.card-price span {
+    font-family: 'Onest', sans-serif;
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--text-m);
+}
+
+.card-phone {
+    background: var(--green);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 7px 12px;
+    font-size: 12px;
+    font-family: 'Onest', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+}
+
+/* ── Empty state ── */
+.empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-m);
+}
+
+.empty-icon {
+    font-size: 52px;
+    margin-bottom: 12px;
+}
+
+.empty h3 {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 14px;
+    margin-bottom: 6px;
+    color: var(--text);
+}
+
+.empty p {
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+/* ── Loading ── */
+.skeleton {
+    background: linear-gradient(90deg, var(--sand-d) 25%, var(--sand) 50%, var(--sand-d) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.2s infinite;
+    border-radius: var(--r);
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: 200% 0
+    }
+    100% {
+        background-position: -200% 0
+    }
+}
+
+.skel-card {
+    height: 240px;
+}
+
+/* ── Add form page ── */
+.page-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+
+.form-group {
+    margin-bottom: 14px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-m);
+    margin-bottom: 6px;
+}
+
+.form-group input, .form-group textarea, .form-group select {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--white);
+    font-family: 'Onest', sans-serif;
+    font-size: 15px;
+    color: var(--text);
+    outline: none;
+    transition: border-color .15s;
+}
+
+.form-group input:focus, .form-group textarea:focus {
+    border-color: var(--green);
+}
+
+.form-group textarea {
+    resize: none;
+    height: 80px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.btn-submit {
+    width: 100%;
+    padding: 15px;
+    background: var(--green);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-family: 'Unbounded', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 6px;
+    transition: background .15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-submit:disabled {
+    background: var(--text-s);
+    cursor: not-allowed;
+}
+
+.btn-submit:active:not(:disabled) {
+    background: var(--green-l);
+}
+
+/* ── Toast ── */
+.toast {
+    position: fixed;
+    bottom: calc(var(--tab-h) + var(--safe-b) + 20px);
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    opacity: 0;
+    background: var(--text);
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: 20px;
+    font-size: 13px;
+    white-space: nowrap;
+    z-index: 100;
+    transition: all .25s;
+    pointer-events: none;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* ── Bottom tabs ── */
+.tabs {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 20;
+    background: var(--white);
+    border-top: 1px solid var(--border);
+    display: flex;
+    height: calc(var(--tab-h) + var(--safe-b));
+    padding-bottom: var(--safe-b);
+}
+
+.tab {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    cursor: pointer;
+    border: none;
+    background: none;
+    font-family: 'Onest', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--text-s);
+    transition: color .15s;
+    padding: 0;
+}
+
+.tab.active {
+    color: var(--green);
+}
+
+.tab svg {
+    width: 22px;
+    height: 22px;
+}
+
+/* ── Detail modal ── */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, .45);
+    z-index: 50;
+    display: flex;
+    align-items: flex-end;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .25s;
+}
+
+.modal-overlay.open {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.modal {
+    background: var(--white);
+    border-radius: 24px 24px 0 0;
+    width: 100%;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 20px 20px calc(20px + var(--safe-b));
+    transform: translateY(40px);
+    transition: transform .3s ease;
+}
+
+.modal-overlay.open .modal {
+    transform: translateY(0);
+}
+
+.modal-handle {
+    width: 36px;
+    height: 4px;
+    background: var(--sand-d);
+    border-radius: 2px;
+    margin: 0 auto 18px;
+}
+
+.modal-img {
+    width: 100%;
+    height: 200px;
+    border-radius: 16px;
+    object-fit: cover;
+    background: linear-gradient(135deg, var(--green-xl), var(--sand-d));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 64px;
+    margin-bottom: 16px;
+    overflow: hidden;
+}
+
+.modal-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.modal-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.modal-loc {
+    font-size: 13px;
+    color: var(--text-m);
+    margin-bottom: 14px;
+}
+
+.modal-price {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--green);
+    margin-bottom: 16px;
+}
+
+.modal-price span {
+    font-family: 'Onest', sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--text-m);
+}
+
+.modal-desc {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text-m);
+    margin-bottom: 16px;
+}
+
+.modal-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.info-chip {
+    background: var(--sand);
+    border-radius: 10px;
+    padding: 10px 12px;
+}
+
+.info-chip .lbl {
+    font-size: 11px;
+    color: var(--text-s);
+    margin-bottom: 2px;
+}
+
+.info-chip .val {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.modal-call {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    background: var(--green);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    text-align: center;
+    text-decoration: none;
+    font-family: 'Unbounded', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* ── Favorites counter ── */
+.fav-badge {
+    background: var(--green);
+    color: #fff;
+    font-size: 9px;
+    font-weight: 600;
+    border-radius: 6px;
+    padding: 1px 5px;
+    position: absolute;
+    top: 6px;
+    right: 22px;
+}
+
+.tab {
+    position: relative;
 }
