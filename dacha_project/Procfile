@@ -1,1 +1,1 @@
-worker: python dacha_project/bot/dachabot.py
+web: bash start.sh
