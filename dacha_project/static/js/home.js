@@ -1,9 +1,11 @@
 const tg = window.Telegram.WebApp;
 tg.ready();
+
+// Пробуем разные способы получить пользователя
 const user = tg.initDataUnsafe?.user;
+const initData = tg.initData;
 
-alert('user: ' + JSON.stringify(user)); // временно для проверки
-
+alert('user: ' + JSON.stringify(user) + '\ninitData: ' + initData);
 if (user) {
     fetch('/api/users/auth/', {
         method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({user})
