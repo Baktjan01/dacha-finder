@@ -2,18 +2,19 @@ const tg = window.Telegram.WebApp;
 tg.ready();
 const user = tg.initDataUnsafe?.user;
 
+alert('user: ' + JSON.stringify(user)); // временно для проверки
+
 if (user) {
     fetch('/api/users/auth/', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({user})
+        method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({user})
     })
         .then(res => res.json())
         .then(data => {
+            alert('ответ: ' + JSON.stringify(data)); // временно
             window.currentUserId = data.user_id;
             window.currentTelegramId = data.telegram_id;
-            console.log('Авторизован:', data);
-        });
+        })
+        .catch(err => alert('ошибка: ' + err)); // временно
 }
 
 function showPage(name) {
@@ -41,8 +42,7 @@ function openModal(id) {
 }
 
 function closeModal(e) {
-    if (e.target === document.getElementById('modalOverlay'))
-        document.getElementById('modalOverlay').classList.remove('open');
+    if (e.target === document.getElementById('modalOverlay')) document.getElementById('modalOverlay').classList.remove('open');
 }
 
 // ── Submit ──
